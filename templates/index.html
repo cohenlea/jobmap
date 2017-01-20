@@ -1,0 +1,97 @@
+    <!doctype html>
+    <html>
+    <head>
+    
+    <!-- Adding in the Leaflet CSS file -->
+    <link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.6.4/leaflet.css" />
+    <!--[if lte IE 8]>
+         <link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.6.4/leaflet.ie.css" />
+    <![endif]-->
+
+    <!-- Adding Leaflet JavaScript file -->
+    <script src="http://cdn.leafletjs.com/leaflet-0.6.4/leaflet.js"></script>
+
+    <!-- put 'var places =  ' at the beginning of the geojson, and then save the file as places.js -->
+    <!-- <script src="places.js"></script> -->
+
+    <!-- Adding styling info for the map -->
+    <style type="text/css">
+    #map { height: 760px; }
+    </style>
+
+    </head>
+
+    <body>
+      <!-- Creating the map div -->
+      <div id="map"></div>
+
+      <!-- The JavaScript that's powering the map -->
+      <script>
+
+      // Initialize the map
+      var map = L.map('map').setView([-2.0, -40.0], 3);
+      
+
+      // Add tiles
+      L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
+      }).addTo(map);
+
+      // add markers
+     var geojsonMarkerWork = {
+        radius: 10,
+        fillColor: "#8B008B",
+        color: "#000",
+        weight: 2,
+        opacity: 1,
+        fillOpacity: 0.8
+    };
+
+    var geojsonMarkerSchool = {
+        radius: 6,
+        fillColor: "#9370DB",
+        color: "#000",
+        weight: 2,
+        opacity: 1,
+        fillOpacity: 0.8
+    };
+
+    L.geoJson({{ jobs|tojson }}, {
+        pointToLayer: function(feature, latlng) {
+            switch (feature.properties.purpose) {
+               case 'work': return L.circleMarker(latlng, geojsonMarkerWork);
+               case 'school': return L.circleMarker(latlng, geojsonMarkerSchool);
+               default: return L.circleMarker(latlng, geojsonMarkerWork);
+            }
+            
+        }, 
+        onEachFeature: function onEachFeature(feature, layer) {
+            console.log(feature);
+            if (feature.properties && feature.properties.descript !== '') {
+                console.log('here');
+                var the_content = "<strong>" + feature.properties.title + " at " + feature.properties.company + "</strong> in " + feature.properties.city + ", " + feature.properties.country + "<br><i>" + feature.properties.descript + "<i>";
+                var popup = L.popup().setContent(the_content);
+                layer.bindPopup(popup);
+            }
+        }
+    }).addTo(map);
+
+      </script>
+          <h3 style = 'padding:2px;margin:2px;position:fixed;top:10px;left:50px;'>Lea Cohen, map maker extraordinaire. <br> Click on the points for more info.</h3>
+    </body>
+    </html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
